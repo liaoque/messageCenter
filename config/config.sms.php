@@ -1,44 +1,26 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2017/5/31
- * Time: 11:09
- */
-class Config_KuaiDi
+//云通信
+class Config_Sms
 {
-	//填写快递的相关参数
-    const appId = 1;
-    const className = 'KuaiDi100';
-    const notifyUrl = '';
-    const appKey = '';
-    const salt = '1234536';
+    //填写快递的相关参数
+    const ACCOUNT_SID = '';
+    const ACCOUNT_TOKEN = '';
+    const APPID = '';
 
+    public static function getAccountSid()
+    {
+        return self::ACCOUNT_SID;
+    }
+
+    public static function getAccountToken()
+    {
+        return self::ACCOUNT_TOKEN;
+    }
 
     public static function getAppId()
     {
-        return self::appId;
+        return self::APPID;
     }
 
-    public static function getClassName()
-    {
-        return self::className;
-    }
-
-    public static function getNotifyUrl()
-    {
-        return self::notifyUrl;
-    }
-
-    public static function getAppKey()
-    {
-        return self::appKey;
-    }
-
-    public static function getSalt()
-    {
-        return self::salt;
-    }
 }
-

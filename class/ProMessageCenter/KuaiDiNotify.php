@@ -18,40 +18,55 @@ class ProMessageCenter_KuaiDiNotify
         return Cache_Queue::getInstance()->set($key, $data);
     }
 
-    public function getService()
+    /**
+     * @param int $otherAppId 快递平台帐号配置id
+     * @return Kuaidi_Service|null
+     */
+    public function getService($otherAppId = 1)
     {
         if (!$this->service) {
-            $this->service = new Kuaidi_Service();
+            $this->service = new Kuaidi_Service($otherAppId);
         }
         return $this->service;
     }
 
-    public function notify($data)
+    /**
+     * @param $data
+     * @param int $otherAppId 快递平台帐号配置id
+     * @return mixed
+     * @throws Kuaidi_Exception
+     */
+    public function notify($data, $otherAppId = 1)
     {
         //校验签名
         parse_str($data, $params);
-        if (!$this->checkSign($params)) {
+        if (!$this->checkSign($params, $otherAppId)) {
             throw new Kuaidi_Exception(Kuaidi_Exception::STATUS_FORBIDDEN_SIGN);
         }
-        $service = $this->getService();
-
+        $service = $this->getService($otherAppId);
         return $service->notify($params);
     }
 
     /**
      * @param $code 状态吗,  1. 是正确, 2.是错误
      * @param array|string $mes 扩展信息,具体类型根据 快递的具体接口来定
+     * @param int $otherAppId 快递平台帐号配置id
      * @return mixed
      */
-    public function response($code, $mes)
+    public function response($code, $mes, $otherAppId = 1)
     {
-        $service = $this->getService();
+        $service = $this->getService($otherAppId);
         return $service->response($code, $mes);
     }
 
-    public function checkSign($result)
+    /**
+     * @param $result
+     * @param int $otherAppId 快递平台帐号配置id
+     * @return mixed
+     */
+    public function checkSign($result, $otherAppId = 1)
     {
-        return $this->getService()->checkNotifySign($result);
+        return $this->getService($otherAppId)->checkNotifySign($result);
     }
 
     /**

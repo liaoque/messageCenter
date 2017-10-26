@@ -3,7 +3,7 @@ if (!defined('IN_BOOT')) {
     exit('Access Denied');
 }
 
-class ProMessageCenter_MessageCheck extends RouteBase
+class ProMessageCenter_MessageCheck
 {
 
     public $param = array();

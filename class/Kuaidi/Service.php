@@ -15,11 +15,10 @@ class Kuaidi_Service implements Kuaidi_BaseService
 
     private $drivice = null;
 
-
-    public function __construct()
+    public function __construct($otherAppId = 0)
     {
         if (empty($this->getDrivice())) {
-            $this->init();
+            $this->init($otherAppId);
             $className = 'Kuaidi_' . $this->config['className'];
             if (!class_exists($className)) {
                 throw new Exception('快递对象不存在');
@@ -28,7 +27,7 @@ class Kuaidi_Service implements Kuaidi_BaseService
         }
     }
 
-    public function init()
+    public function init($otherAppId = 0)
     {
         /**
          * 目前使用了配置文件,
@@ -36,14 +35,20 @@ class Kuaidi_Service implements Kuaidi_BaseService
          * 完全可以改写这个方法,
          * 使用数据库接口信息
          */
-        include_once ROOT . '/config/config.kuaidi.php';
-        $this->config = [
-            'appId' => Config_KuaiDi::getAppId(),
-            'className' => Config_KuaiDi::getClassName(),
-            'notifyUrl' => Config_KuaiDi::getNotifyUrl(),
-            'appKey' => Config_KuaiDi::getAppKey(),
-            'salt' => Config_KuaiDi::getSalt(),
-        ];
+        if ($otherAppId) {
+            $app = DbMessageCenter_KuaidiOtherAppList::getInstance()->find(['id' => $otherAppId]);
+        } else {
+            $app = DbMessageCenter_KuaidiOtherAppList::getInstance()->findRandAppOfCache();
+        }
+        if (!empty($app)) {
+            $this->config = [
+                'appId' => $app['id'],
+                'className' => DbMessageCenter_KuaidiOtherAppList::getClassName($app['type']),
+                'notifyUrl' => $app['notifyUrl'],
+                'appKey' => $app['appKey'],
+                'salt' => $app['salt'],
+            ];
+        }
     }
 
     protected function getDrivice()
@@ -154,8 +159,7 @@ class Kuaidi_Service implements Kuaidi_BaseService
 
     public function checkNotifySign($result)
     {
-        log_message('EXPRESS INFO',json_encode($this->config),'salt');
-
+        log_message('EXPRESS INFO', json_encode($this->config), 'salt');
         return $this->drivice->checkNotifySign($result, $this->config);
     }
 

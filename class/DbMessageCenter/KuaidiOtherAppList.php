@@ -16,6 +16,10 @@ class DbMessageCenter_KuaidiOtherAppList extends Model
         self::STATUS_CLOSE => '关闭',
     ];
 
+    public static $typeLits = [
+        1 => 'KuaiDi100'
+    ];
+
 
     public function __construct()
     {
@@ -23,5 +27,27 @@ class DbMessageCenter_KuaidiOtherAppList extends Model
         parent::__construct();
     }
 
+    /**
+     * 随机获取一个有效的三方快递配置
+     * @return array
+     */
+    public function findRandAppOfCache()
+    {
+        $key = self::REDIS_KEY . 'randApp';
+        $result = $this->proxyModelSearchWithRedis($key, [$this, 'findAll'], [
+            [
+                'status' => self::STATUS_OPEN
+            ]
+        ]);
+        $app = [];
+        if (!empty($result)) {
+            $app = $result[intval(mt_rand(0, count($result)))];
+        }
+        return $app;
+    }
 
+    public static function getClassName($type = 1)
+    {
+        return self::$typeLits[$type];
+    }
 }
